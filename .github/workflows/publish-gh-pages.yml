@@ -1,11 +1,5 @@
 name: Build site and publish to GitHub Pages
 
-# Set permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 # Allow only one concurrent deployment
 concurrency:
   group: "pages"
@@ -21,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -37,6 +31,24 @@ jobs:
     - uses: actions/upload-pages-artifact@v1
       with:
         path: dist/
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
+
+  deploy:
+    # Mark the "build" job as a depency for this job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a GitHub Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
