@@ -1,4 +1,4 @@
-name: Build Site and Upload Artifact
+name: Build site and publish to GitHub Pages
 
 on:
   push:
@@ -19,8 +19,10 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-pages-artifact@v1
       with:
-        name: dist
         path: dist/
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
 
